@@ -12,6 +12,13 @@ namespace bicyclefinder.Models
     [ApiController]
     public class BicyclesController : ControllerBase
     {
+        private readonly BicycleFinderContext _context;
+
+        public BicyclesController(BicycleFinderContext context)
+        {
+            _context = context;
+        }
+
         private static readonly List<Bicycle> Bicycles = new List<Bicycle>
         {
             new Bicycle
@@ -29,13 +36,13 @@ namespace bicyclefinder.Models
         [HttpGet]
         public IEnumerable<Bicycle> GetAll()
         {
-            return Bicycles;
+            return _context.Bicycles;
         }
 
         [HttpGet("{missingFound}")]
         public IEnumerable<Bicycle> GetMissingOrFound(string missingFound)
         {
-            return Bicycles.FindAll(bicycle =>
+            return _context.Bicycles.Where(bicycle =>
                 bicycle.MissingFound != null &&
                 bicycle.MissingFound.Equals(missingFound, StringComparison.OrdinalIgnoreCase));
         }
@@ -61,7 +68,7 @@ namespace bicyclefinder.Models
         [HttpGet("id/{id}")]
         public Bicycle Get(int id)
         {
-            return Bicycles.FirstOrDefault(bicycle => bicycle.Id == id);
+            return _context.Bicycles.FirstOrDefault(bicycle => bicycle.Id == id);
         }
 
         // POST api/<BicyclesController>
@@ -69,11 +76,12 @@ namespace bicyclefinder.Models
         public Bicycle Post([FromBody] Bicycle value)
         {
             // TODO extra generator method. Call from static list
-            value.Id = _nextId++;
+            //value.Id = _nextId++;
             DateTime now = DateTime.Now;
             string nowStr = now.ToString("yyyy-MM-dd");
             value.Date = nowStr;
-            Bicycles.Add(value);
+            _context.Bicycles.Add(value);
+            _context.SaveChangesAsync();
             return value;
         }
 

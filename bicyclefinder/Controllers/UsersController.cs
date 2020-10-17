@@ -13,33 +13,43 @@ namespace bicyclefinder.Models
     public class UsersController : ControllerBase
     {
 
+        private readonly BicycleFinderContext _context;
+
+        public UsersController(BicycleFinderContext context)
+        {
+            _context = context;
+        }
+
         private static readonly List<User> Users = new List<User>
         {
             new User {Id = 1, Name = "Anders B", Phone = "12345678", FirebaseUserId = "FAKE1"},
             new User {Id = 2, Name = "Peter", Phone = "87654321", FirebaseUserId = "FAKE2"}
         };
 
-        private static int _nextId = Users.Count + 1;
+        //private static int _nextId = Users.Count + 1;
 
         // GET: api/<UsersController>
         [HttpGet]
         public IEnumerable<User> Get()
         {
-            return Users;
+            //return Users;
+            return _context.Users;
         }
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
         public User Get(int id)
         {
-            return Users.FirstOrDefault(user => user.Id == id);
+            return _context.Users.FirstOrDefault(user => user.Id == id);
+            //return Users.FirstOrDefault(user => user.Id == id);
         }
 
         // GET api/<UsersController>/5
         [HttpGet("firebaseuserid/{id}")]
         public User GetByFirebaseUserId(string id)
         {
-            return Users.FirstOrDefault(user => user.FirebaseUserId == id);
+            return _context.Users.FirstOrDefault(user => user.FirebaseUserId == id);
+            //return Users.FirstOrDefault(user => user.FirebaseUserId == id);
         }
 
         /*[HttpGet("test/test")]
@@ -52,13 +62,16 @@ namespace bicyclefinder.Models
         [HttpPost]
         public User Post([FromBody] User value)
         {
-            if (Users.Exists(user => user.FirebaseUserId == value.FirebaseUserId))
+            _context.Users.Add(value);
+            _context.SaveChangesAsync();
+            return value;
+            /*if (Users.Exists(user => user.FirebaseUserId == value.FirebaseUserId))
             {
                 return null;
             }
             value.Id = _nextId++;
             Users.Add(value);
-            return value;
+            return value;*/
         }
 
         /*// PUT api/<UsersController>/5
@@ -67,6 +80,6 @@ namespace bicyclefinder.Models
         {
         }*/
 
-        
+
     }
 }
