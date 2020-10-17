@@ -19,7 +19,7 @@ namespace bicyclefinder.Models
             _context = context;
         }
 
-        private static readonly List<Bicycle> Bicycles = new List<Bicycle>
+        /*private static readonly List<Bicycle> Bicycles = new List<Bicycle>
         {
             new Bicycle
             {
@@ -31,6 +31,7 @@ namespace bicyclefinder.Models
         };
 
         private static int _nextId = Bicycles.Count + 1;
+        */
 
         // GET: api/<BicyclesController>
         [HttpGet]
@@ -95,7 +96,10 @@ namespace bicyclefinder.Models
         [HttpDelete("{id}")]
         public int Delete(int id)
         {
-            return Bicycles.RemoveAll(bicycle => bicycle.Id == id);
+            Bicycle cycle = _context.Bicycles.Find(id);
+            if (cycle == null) return 0;
+             _context.Bicycles.Remove(cycle);
+             return 1;
         }
     }
 }
