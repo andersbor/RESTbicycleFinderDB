@@ -72,17 +72,25 @@ namespace bicyclefinder.Models
             return _context.Bicycles.FirstOrDefault(bicycle => bicycle.Id == id);
         }
 
+        [HttpGet("firebaseUserId/{firebaseUserId}")]
+        public IEnumerable<Bicycle> GetByFirebaseUserId(string firebaseUserId)
+        {
+            return _context.Bicycles.Where(bicycle =>
+                bicycle.FirebaseUserId == firebaseUserId);
+        }
+
+
         // POST api/<BicyclesController>
         [HttpPost]
         public Bicycle Post([FromBody] Bicycle value)
         {
-            // TODO extra generator method. Call from static list
             //value.Id = _nextId++;
             DateTime now = DateTime.Now;
             string nowStr = now.ToString("yyyy-MM-dd");
             value.Date = nowStr;
             _context.Bicycles.Add(value);
-            _context.SaveChangesAsync();
+            //_context.SaveChangesAsync();
+            int saved = _context.SaveChanges();
             return value;
         }
 
@@ -99,6 +107,7 @@ namespace bicyclefinder.Models
             Bicycle cycle = _context.Bicycles.Find(id);
             if (cycle == null) return 0;
              _context.Bicycles.Remove(cycle);
+             _context.SaveChanges();
              return 1;
         }
     }
